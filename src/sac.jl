@@ -40,9 +40,9 @@ function compute_loss_pi(ac::MLPActorCritic, data::NamedTuple, alpha::Vector{Flo
 
 	# The following lines of code implement the "policy-loss weighting"
 	# The logic to implement is "if a failure event is reached then learn from probability and if not then learn from miss distance"
-	q_pi_sum = ((ones(length(q_pi[2]),1).- (q_pi[2]./100)).*q_pi[3]) .+ q_pi[2] .+ ((q_pi[2]./100).*q_pi[1])
+	# q_pi_sum = ((ones(length(q_pi[2]),1).- (q_pi[2]./100)).*q_pi[3]) .+ q_pi[2] .+ ((q_pi[2]./100).*q_pi[1])
 	# Uncomment the line below to revert to the original split reward configuration
-	# q_pi_sum = sum(q_pi)
+	q_pi_sum = sum(q_pi)
 
     # Entropy-regularized policy loss
     loss_pi = mean(alpha[] .* logp_pi .- q_pi_sum)
