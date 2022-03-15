@@ -192,7 +192,8 @@ function Flux.Optimise.apply!(o::AdaBelief, x, Δ)
 	mt, st = get!(o.state, x, (zero(x), zero(x)))
 	@. mt = β[1] * mt + (1 - β[1]) * Δ
 	@. st = β[2] * st + (1 - β[2]) * (Δ - mt)^2
-	@. Δ =  η * mt / (√(st) + Flux.Optimise.ϵ)
+# 	@. Δ =  η * mt / (√(st) + Flux.Optimise.ϵ)
+	@. Δ =  η * mt / (√(st) + o.epsilon)
 	return Δ
 end
 
