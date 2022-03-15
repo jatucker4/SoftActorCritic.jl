@@ -1,6 +1,6 @@
 const LOG_STD_MAX = 2
 const LOG_STD_MIN = -20
-using Flux
+const ϵ = 1e-8
 
 """
 Defines native softplus function to avoid CUDA bugs.
@@ -183,12 +183,9 @@ mutable struct AdaBelief
 	eta::Float64
 	beta::Tuple{Float64,Float64}
 	state::IdDict
-	epsilon::Float64
 end
 
-# AdaBelief(η = 0.001, β = (0.9, 0.999)) = AdaBelief(η, β, IdDict())
-AdaBelief(η::Real = 0.001, β = (0.9, 0.999), ϵ::Real = EPS) = AdaBelief(η, β, ϵ, IdDict())
-AdaBelief(η::Real, β::Tuple, state::IdDict) = AdaBelief(η, β, EPS, state)
+AdaBelief(η = 0.001, β = (0.9, 0.999)) = AdaBelief(η, β, IdDict())
 			
 function Flux.Optimise.apply!(o::AdaBelief, x, Δ)
 	η, β = o.eta, o.beta
@@ -196,7 +193,7 @@ function Flux.Optimise.apply!(o::AdaBelief, x, Δ)
 	@. mt = β[1] * mt + (1 - β[1]) * Δ
 	@. st = β[2] * st + (1 - β[2]) * (Δ - mt)^2
 # 	@. Δ =  η * mt / (√(st) + Flux.Optimise.ϵ)
-	@. Δ =  η * mt / (√(st) + o.epsilon)
+	@. Δ =  η * mt / (√(st) + ϵ)
 	return Δ
 end
 
